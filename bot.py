@@ -670,7 +670,7 @@ async def heist(interaction: discord.Interaction, pot: int = 1000):
 # ── Admin commands ─────────────────────────────────────────────────────────
 @bot.tree.command(name="additem", description="[Admin] Add an item to the shop")
 @app_commands.describe(name="Item name", role="Role to grant", price="Cost in coins", duration_days="Days until expires (0=permanent)")
-@app_commands.checks.has_permissions(administrator=True)
+@app_commands.check(lambda i: i.user.id == 335927174701907968)
 async def additem(interaction: discord.Interaction, name: str, role: discord.Role, price: int, duration_days: int = 0):
     db.add_shop_item(interaction.guild_id, name, role.id, role.name, price, duration_days or None)
     await interaction.response.send_message(
@@ -679,7 +679,7 @@ async def additem(interaction: discord.Interaction, name: str, role: discord.Rol
 
 @bot.tree.command(name="removeitem", description="[Admin] Remove an item from the shop")
 @app_commands.describe(name="Item name to remove")
-@app_commands.checks.has_permissions(administrator=True)
+@app_commands.check(lambda i: i.user.id == 335927174701907968)
 async def removeitem(interaction: discord.Interaction, name: str):
     removed = db.remove_shop_item(interaction.guild_id, name)
     if removed:
@@ -689,7 +689,7 @@ async def removeitem(interaction: discord.Interaction, name: str):
 
 @bot.tree.command(name="grantcoins", description="[Admin] Grant coins to a member")
 @app_commands.describe(member="Member to reward", amount="Coins to grant")
-@app_commands.checks.has_permissions(administrator=True)
+@app_commands.check(lambda i: i.user.id == 335927174701907968)
 async def grantcoins(interaction: discord.Interaction, member: discord.Member, amount: int):
     db.ensure_user(interaction.guild_id, member.id)
     new_bal = db.add_coins(interaction.guild_id, member.id, amount)
@@ -698,7 +698,7 @@ async def grantcoins(interaction: discord.Interaction, member: discord.Member, a
 
 @bot.tree.command(name="removecoins", description="[Admin] Remove coins from a member")
 @app_commands.describe(member="Member", amount="Coins to remove")
-@app_commands.checks.has_permissions(administrator=True)
+@app_commands.check(lambda i: i.user.id == 335927174701907968)
 async def removecoins(interaction: discord.Interaction, member: discord.Member, amount: int):
     db.ensure_user(interaction.guild_id, member.id)
     balance = db.get_balance(interaction.guild_id, member.id)
@@ -709,7 +709,7 @@ async def removecoins(interaction: discord.Interaction, member: discord.Member, 
 
 @bot.tree.command(name="resetcheckin", description="[Admin] Reset daily checkin for a member")
 @app_commands.describe(member="Member to reset")
-@app_commands.checks.has_permissions(administrator=True)
+@app_commands.check(lambda i: i.user.id == 335927174701907968)
 async def resetcheckin(interaction: discord.Interaction, member: discord.Member):
     db.ensure_user(interaction.guild_id, member.id)
     db.reset_checkin(interaction.guild_id, member.id)
@@ -717,7 +717,7 @@ async def resetcheckin(interaction: discord.Interaction, member: discord.Member)
 
 @bot.tree.command(name="setrate", description="[Admin] Set coin earn rates")
 @app_commands.describe(message_coins="Per message", checkin_coins="Daily checkin", voice_coins="Per minute in VC")
-@app_commands.checks.has_permissions(administrator=True)
+@app_commands.check(lambda i: i.user.id == 335927174701907968)
 async def setrate(interaction: discord.Interaction, message_coins: int = None, checkin_coins: int = None, voice_coins: int = None):
     changes = []
     if message_coins is not None:
@@ -736,7 +736,7 @@ async def setrate(interaction: discord.Interaction, message_coins: int = None, c
 
 @bot.tree.command(name="logs", description="[Admin] View recent bot activity")
 @app_commands.describe(limit="How many entries (default 50, max 100)")
-@app_commands.checks.has_permissions(administrator=True)
+@app_commands.check(lambda i: i.user.id == 335927174701907968)
 async def logs(interaction: discord.Interaction, limit: int = 50):
     limit = min(limit, 100)
     rows = db.get_logs(interaction.guild_id, limit)
@@ -780,7 +780,7 @@ async def logs(interaction: discord.Interaction, limit: int = 50):
 # ── Error handler ──────────────────────────────────────────────────────────
 @bot.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error):
-    if isinstance(error, app_commands.MissingPermissions):
+    if isinstance(error, app_commands.CheckFailure):
         await interaction.response.send_message("❌ You need **Administrator** permission.", ephemeral=True)
     else:
         await interaction.response.send_message(f"❌ Error: {error}", ephemeral=True)
