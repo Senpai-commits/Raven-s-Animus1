@@ -7,16 +7,16 @@ echo ============================================
 echo           ROLESHOP BOT - STARTING
 echo ============================================
 echo.
-echo [%time%] Installing dependencies...
 
 cd /d "C:\Users\maxic\OneDrive\Bureau\Discord Dev\roleshop"
+echo [%time%] Working directory: %CD%
+echo [%time%] Installing dependencies...
 pip install -r requirements.txt -q
-
 echo [%time%] Bot is running...
 echo Press CTRL+C to stop.
 echo.
 
-python bot.py
+python -u bot.py
 
 echo.
 echo ============================================
