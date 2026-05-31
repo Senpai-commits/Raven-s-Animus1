@@ -12,6 +12,16 @@ class Database:
         return conn
 
     def init(self):
+        import os
+        # Auto-detect old schema and wipe if columns missing
+        if os.path.exists(self.path):
+            try:
+                with self._conn() as c:
+                    c.execute("SELECT bank, mmr, first_deposit FROM users LIMIT 1")
+            except Exception:
+                os.remove(self.path)
+                print("⚠️  Old database detected — recreating with new schema...")
+
         with self._conn() as c:
             c.executescript("""
                 CREATE TABLE IF NOT EXISTS users (
